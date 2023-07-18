@@ -17,7 +17,6 @@ app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/videos", videoRouter);
 
-// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
