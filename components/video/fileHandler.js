@@ -1,14 +1,24 @@
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("cloudinary").v2;
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "public");
-  },
-  filename: function (req, file, cb) {
-    const ext = file.mimetype.split("/")[1];
-    cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`);
-  },
-});
+// cloudinary.config({
+//   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//   api_key: process.env.CLOUDINARY_API_KEY,
+//   api_secret: process.env.CLOUDINARY_API_SECRET,
+// });
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "public");
+//   },
+//   filename: function (req, file, cb) {
+//     const ext = file.mimetype.split("/")[1];
+//     cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`);
+//   },
+// });
+
+const storage = multer.memoryStorage();
 
 // Multer Filter
 const filter = (req, file, cb) => {
@@ -21,4 +31,22 @@ const filter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter: filter });
 
-module.exports = { upload };
+const uploadFile = async (
+  fileBuffer,
+  filename,
+  fileMimeType,
+  title,
+  userId
+) => {
+  const b64 = Buffer.from(fileBuffer).toString("base64");
+  let dataUri = `data:${fileMimeType};base64,${b64}`;
+
+  const res = await cloudinary.uploader.upload(dataUri, {
+    resource_type: "auto",
+    public_id: `${userId}-${Date.now()}-${title}-${filename}`,
+  });
+
+  return res;
+};
+
+module.exports = { upload, uploadFile };

@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Video = require("../models/Video");
+const { uploadFile } = require("./fileHandler");
 
 const getAllVideos = async (req, res) => {
   try {
@@ -13,15 +14,31 @@ const getAllVideos = async (req, res) => {
 const postVideo = async (req, res) => {
   try {
     const { title } = req.body;
-    const { filename } = req.file;
+    console.log(req.file);
 
-    console.log(title, filename);
+    const { originalname, buffer, mimetype } = req.file;
 
-    const video = new Video({ title, filename, user: req.userId });
+    const cloudRes = await uploadFile(
+      buffer,
+      originalname,
+      mimetype,
+      title,
+      req.userId
+    );
+
+    // return res.json(cloudRes);
+
+    const video = new Video({
+      title,
+      filename: cloudRes.secure_url,
+      user: req.userId,
+      cloudRes,
+    });
     await video.save();
 
     res.json(video);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 };
