@@ -41,9 +41,14 @@ const uploadFile = async (
   const b64 = Buffer.from(fileBuffer).toString("base64");
   let dataUri = `data:${fileMimeType};base64,${b64}`;
 
+  let public_id = `${userId}-${Date.now()}-${title}-${filename}`.replace(
+    " ",
+    "_"
+  );
+
   const res = await cloudinary.uploader.upload(dataUri, {
     resource_type: "auto",
-    public_id: `${userId}-${Date.now()}-${title}-${filename}`,
+    public_id,
   });
 
   return res;
