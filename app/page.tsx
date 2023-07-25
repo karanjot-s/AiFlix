@@ -71,7 +71,7 @@ export default function Home() {
             video={{
               id: trailer._id,
               title: trailer.title,
-              link: `${API_URL}/public/${trailer.filename}`,
+              link: trailer.filename,
               upvotes: trailer.upvotes,
               downvotes: trailer.downvotes,
             }}
